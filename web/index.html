@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Eat cells smaller than you and don't get eaten by the bigger ones, as an MMO">
+    <meta name="keywords" content="agario, agar, io, cell, cells, virus, bacteria, blob, game, games, web game, html5, fun, flash">
+    <meta name="robots" content="index, follow">
+    <meta name="viewport" content="minimal-ui, width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <title>Alpha</title>
+
+    <link id="favicon" rel="icon" type="image/png" href="assets/img/favicon.png">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu:700" rel="stylesheet" type="text/css">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/index.css" rel="stylesheet">
+    <link href="assets/css/gallery.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" type="text/css" href="https://tricksplit.io/static/css/main.bb395b65.css">
+    <link rel="stylesheet" type="text/css" href="https://tricksplit.io/static/css/vendor.efd8bab0.css">  -->
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <script src="assets/js/quadtree.js"></script>
+    <script src="assets/js/main_out.js"></script>
+    
+
+    <script src="http://code.jquery.com/jquery-1.12.4.js" integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU=" crossorigin="anonymous"></script>
+    <script src="http://code.jquery.com/jquery-3.5.1.slim.js" integrity="sha256-DrT5NfxfbHvMHux31Lkhxg42LY6of8TaYyK50jnxRnM=" crossorigin="anonymous">
+    </script>
+</head>
+
+<body>
+        <div id="Menu" contextmenu="Menu1" style="display: none;">
+        
+        <menu type="context" id="Menu1">
+          <menuitem label="Refresh" onclick="window.location.reload();" icon="ico_reload.png"></menuitem>
+          <menu label="Share on...">
+            <menuitem label="Twitter" icon="ico_twitter.png" onclick="window.open('//twitter.com/intent/tweet?text=' + window.location.href);"></menuitem>
+            <menuitem label="Facebook" icon="ico_facebook.png" onclick="window.open('//facebook.com/sharer/sharer.php?u=' + window.location.href);"></menuitem>
+          </menu>
+          <menuitem label="Email This Page" onclick="window.location='mailto:?body='+window.location.href;"></menuitem>
+        </menu>
+
+        </div>
+
+         
+        <script>
+            document.getElementById("Menu").oncontextmenu = function() {
+
+                 document.getElementById("Menu").addEventListener("mousemove", function(event) {
+                  mousemove(event);
+                });
+
+                function mousemove(event) {
+                    var x = event.clientX;
+                    var y = event.clientY; 
+                }  
+                function Menu() {
+                   console.log("click");
+                   $("#Menu").click(function() {
+                        $("#Menu1").hide();
+                        
+                    });
+                }
+            };
+        </script>
+    <div id="gallery" onclick="if (event.target == this) this.hide()" style="display: none;">
+        <div id="gallery-content">
+            <div id="gallery-header">Skins</div>
+            <div id="gallery-body"></div>
+        </div>
+    </div>
+    <img src="assets/img/background.png" id="background" style="display: none;">
+
+    <div id="overlays" style="display: none;">
+        <div id="helloDialog">
+
+            <div class="form-group">
+                <h2 id="title" style="text-align: center;">Alpha 1</h2>
+            </div>
+
+            <div class="form-group">
+                <input id="nick" class="form-control" placeholder="Nickname" maxlength="20">
+                <input id="skin" class="form-control" placeholder="Skin Name">
+                <select id="gamemode" class="form-control" onchange="setserver(this.value)" required>
+                    <option value="localhost:443" selected>FFA</option>
+                    <option value="localhost:8080" selected>FFA2</option>
+                    <option value="partyteam.glitch.me" selected>Party</option>
+                    <option value="instame.glitch.me" selected>Instame</option>
+                     
+                </select>
+
+
+            </div>
+            <!-- <div class="form-group" id="gamemode">
+                 
+                <div class="gamemode-FFA" onclick="setserver('partyteam.glitch.me')">
+                    <span class="data-name">Party</span>
+                </div>
+                <div class="gamemode-instame" onclick="setserver('instame.glitch.me')">
+                    <span class="data-name">Instamerge</span>
+                </div>
+            </div> -->
+            <button id="play-btn" class="btn btn-play btn-primary btn-needs-server">Play</button>
+            <button id="spectate-btn" onclick="spectate()" class="btn btn-warning btn-spectate btn-needs-server glyphicon glyphicon-eye-open"></button>
+            <button id="gallery-btn" onclick="openSkinsList()" class="btn btn-play btn-primary btn-needs-server btn-info">Skins Gallery</button>
+            <button id="config1" class="btn btn-play btn-primary btn-needs-server btn-info">🔧</button>
+            <button id="config2" style="display: none;" class="btn btn-play btn-primary btn-needs-server btn-info">🔧</button>
+
+            <button id="black" class="btn btn-play btn-primary btn-needs-server btn-info">Black theme</button>
+            <button id="white" style="display: none;" class="btn btn-play btn-primary btn-needs-server btn-info">White theme</button>
+            <script>
+                $("#config1").click(function() {
+                    $("#rigth-panel").show();
+                    $("#config1").hide();
+                    $("#config2").show();
+                    
+                });
+                $("#config2").click(function() {
+                    $("#rigth-panel").hide();
+                    $("#config1").show();
+                    $("#config2").hide();
+                    
+                });
+
+            </script>
+            <script>
+                $("#white").click(function() {
+                    $("#black").show();
+                    $("#white").hide(); 
+                    document.getElementById("helloDialog").style.background = "white";
+                    document.getElementById("left-panel").style.background = "white";
+                    document.getElementById("rigth-panel").style.background = "white";
+                    document.getElementById("rigth-panel").style.color = "black";
+                });
+
+                $("#black").click(function() {
+                    $("#white").show();
+                    $("#black").hide(); 
+                    document.getElementById("helloDialog").style.background = "black";
+                    document.getElementById("left-panel").style.background = "black";
+                    document.getElementById("rigth-panel").style.background = "black";
+                    document.getElementById("rigth-panel").style.color = "white";
+                    move();
+                });
+            </script>
+
+            <div id="instructions">
+                <hr>
+                <center>
+                    <span class="text-muted">
+                        Move your mouse to control your cell<br>
+                        Press <b>Space</b> to split<br>
+                        Press <b>W</b> to eject some mass<br>
+                    </span>
+                </center>
+            </div>
+
+            <hr>
+            <div id="footer">
+                <span class="text-muted">Have fun!</span>
+            </div>
+
+        </div>
+        <div id="left-panel">
+            <img id="profile-image" src=" ">
+            <div id="profile-name">
+                <span>Guest</span>
+            </div>
+            <div id="visualise-skins">
+                <!-- <img class="circular" id="visualise" src=""> -->
+            </div>
+            <div id="myProgress">
+                <div id="myBar"></div>
+            </div>
+            <script type="text/javascript">
+                var i = 0;
+            function move() {
+              if (i == 0) {
+                i = 1;
+                var elem = document.getElementById("myBar");
+                var width = 1;
+                var id = setInterval(frame, 100);
+
+                function frame() {
+                  if (width >= 100) {
+                    clearInterval(id);
+                    i = 0;
+                  } else {
+                    width++;
+                    elem.style.width = width + "%";
+                  }
+                }
+              }
+            }
+            </script>
+        </div>
+        <div id="rigth-panel" style="display: none;">
+            <div id="settings" class="checkbox">
+                <div style="margin: 6px;">
+                    <label><input id="showSkins" type="checkbox">Skins</label>
+                    <label><input id="showNames" type="checkbox">Names</label>
+                    <label><input id="darkTheme" type="checkbox">Dark</label>
+                    <label><input id="showColor" type="checkbox">Color</label>
+                    <label><input id="showMass" type="checkbox">Mass</label>
+                    <label><input id="showChat" type="checkbox">Chat</label>
+                    <label><input id="showMinimap" type="checkbox">Minimap</label>
+                    <!-- <label><input id="showPosition" type="checkbox">Position</label>
+                    <label><input id="showBorder" type="checkbox">Border</label> -->
+                    <!-- <label><input id="showGrid" type="checkbox">Grid</label> -->
+                    <label><input id="moreZoom" type="checkbox">Zoomout</label>
+                    <!-- <label><input id="showFood" type="checkbox">hideFood</label> -->
+                    <!-- <label><input id="fillSkin" type="checkbox">Fill Skin</label> -->
+                    <!-- <label><input id="background" type="checkbox">Background Sectors</label> -->
+                    <label><input id="jellyPhysics" type="checkbox">Jelly Physics</label>
+                    <label><input id="showAnimated" type="checkbox">ShowAnimated</label>
+                    <!-- <label>
+                        <input id="playSounds" type="checkbox">Sounds
+                        <input id="soundsVolume" type="range" min="0" max="1" step="any">
+                    </label> -->
+                    <label>
+                        <!-- <input id="targetSizeX" type="range" min="400" max="50000" >X -->
+                        <input id="frameX" type="range" min="-2" max="2" >X
+                        <input id="frameY" type="range" min="2" max="2" >Y
+                    </label>
+                    <label><input type="text" id="" maxlength="1" value="" placeholder="PressKey" class="form-control key"></label>
+                     
+                     
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="connecting">
+        <div id="connecting-content">
+            <h2>Connecting</h2>
+            <p> If you cannot connect to the servers, check if you have some anti virus or firewall blocking the connection.</p>
+        </div>
+    </div>
+
+    <div id="mobileStuff" style="display: none;">
+        <div id="touchpad"></div>
+        <div id="touchCircle" style="display: none;"></div>
+        <img src="/assets/img/split.png" id="splitBtn">
+        <img src="/assets/img/eject.png" id="ejectBtn">
+    </div>
+
+    <!-- <svg >
+        <circle r="50" cx="100" cy="100"/ >
+    </svg> -->
+    <canvas id="canvas" width="1920" height="1080"></canvas>
+    <input type="text" id="chat_textbox" placeholder="Press enter to chat for team" maxlength="200">
+    <div style="font-family:'Ubuntu'">&nbsp;</div>
+    <img id="virusImage" src="assets/img/virus.png" width="512" height="512">
+    <script type="text/javascript">
+        window.addEventListener('keydown', keydown);
+        window.addEventListener('keyup', keyup);
+        var Feed = false;
+        var Dingus = false;
+        var speed = 25;
+        function keydown(event) {
+            if (event.keyCode == 81) {
+                Feed = true;
+                setTimeout(feed, speed);
+            } // Tricksplit
+            if (event.keyCode == 52) { // 4
+                macroo();
+                setTimeout(macroo, speed), 1000;
+                //setTimeout(macroo, speed) , 3000;
+                // setTimeout(macroo, speed*3) , 1000;
+            } // Triplesplit
+            if (event.keyCode == 65) { // A
+                macroo();
+                setTimeout(macroo, speed);
+                setTimeout(macroo, speed * 2);
+            } // Doublesplit
+            if (event.keyCode == 68 || event.keyCode == 50) { // D ,2
+                macroo();
+                setTimeout(macroo, speed);
+            } // Split
+            if (event.keyCode == 49) {
+                macroo();
+            }
+        } // When Player Lets Go Of Q, It Stops Feeding
+        function keyup(event) {
+            if (event.keyCode == 81) {
+                Feed = false;
+            }
+            // if (event.keyCode == 79) {
+            //     Dingus = false;
+            // }
+        }
+        //Feed Macro With Q
+        function feed() {
+            if (Feed) {
+                window.onkeydown({
+                    keyCode: 81
+                });
+                window.onkeyup({
+                    keyCode: 81
+                });
+                setTimeout(feed, speed);
+            }
+        }
+
+        function macroo() {
+            $("body").trigger($.Event("keydown", {
+                keyCode: 32
+            }));
+            $("body").trigger($.Event("keyup", {
+                keyCode: 32
+            }));
+        }
+    </script>
+ <script type="text/javascript">
+     // ==UserScript==
+// @name         Mini-Map AGAR.IO by d0m (mod by Wsl_F)
+// @version      2.2
+// @description  Лучшая версия мини-карты
+// @author       d0m (mod by Wsl_F)
+// @license      GC
+// @match        *://127.0.0.1:3000/*
+// @match        *://agar.io/*
+// @require      http://cdn.jsdelivr.net/msgpack/1.05/msgpack.js
+// @grant        none
+// @run-at       document-body
+// @namespace https://greasyfork.org/users/17276
+// ==/UserScript==
+
+window.msgpack = this.msgpack;
+
+(function(){
+    var WebSocket = window.WebSocket = window.WebSocket;
+    // var $ = window.jQuery;
+    var msgpack = window.msgpack;
+    var options = {
+        enableMultiCells: true,
+        enableCross: true
+    };
+
+    //Параметры игры
+    var agar_server = null;
+    var map_server = null;
+    var player_name = [];
+    var players = [];
+    var id_players = [];+
+    var cells = [];
+    var current_cell_ids = [];
+    var start_x = -7000,
+        start_y = -7000,
+        end_x = 7000,
+        end_y = 7000,
+        length_x = 14000,
+        length_y = 14000;
+    var render_timer = null;
+    var rendTime = 0;
+    function miniMapSendRawData(data) {
+        if (map_server !== null && map_server.readyState === window.WebSocket.OPEN) {
+            var array = new Uint8Array(data);
+            map_server.send(array.buffer);
+        }
+    }
+
+    /*-------------------------------------------Рендер миникарты-------------------------------------------------*/
+    function miniMapRender() {
+        var canvas = window.mini_map;
+        var mainCtx = canvas.getContext('2d');
+        mainCtx.clearRect(0, 0, canvas.width, canvas.height);
+        rendTime++;
+        if (rendTime>=20) {
+            rendTime= 0;
+            miniMapReset();
+        } else {
+        for (var id in window.mini_map_tokens) {
+            var token = window.mini_map_tokens[id];
+            var x = token.x * canvas.width;
+            var y = token.y * canvas.height;
+            var size = token.size * canvas.width;
+
+            mainCtx.beginPath();
+            mainCtx.arc(
+                x,
+                y,
+                size,
+                0,
+                2 * Math.PI,
+                false
+            );
+            mainCtx.closePath();
+            mainCtx.fillStyle = token.color;
+            mainCtx.fill();
+
+            if (options.enableCross && -1 != current_cell_ids.indexOf(token.id))
+                miniMapDrawCross(token.x, token.y, token.color);
+
+            if (options.enableAxes && -1 != current_cell_ids.indexOf(token.id))
+                miniMapDrawMiddleCross();
+
+            if (id_players[id] !== undefined) {
+                // Draw you party member's crosshair
+                if (options.enableCross) {
+                    miniMapDrawCross(token.x, token.y, token.color);
+                }
+
+                // ctx.font = size * 2 + 'px Arial';
+                // ctx.textAlign = 'center';
+                // ctx.textBaseline = 'middle';
+                // ctx.fillStyle = 'white';
+                // ctx.fillText(id_players[id] + 1, x, y);
+            }
+        }
+        }
+    }
+
+    function miniMapDrawCross(x, y, color) {
+        var canvas = window.mini_map;
+        var ctx = canvas.getContext('2d');
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, y * canvas.height);
+        ctx.lineTo(canvas.width, y * canvas.height);
+        ctx.moveTo(x * canvas.width, 0);
+        ctx.lineTo(x * canvas.width, canvas.height);
+        ctx.closePath();
+        ctx.strokeStyle = '#33FF33';
+        ctx.stroke();
+    }
+    /*-----------------------------------------Рендер миникарты:END-----------------------------------------------*/
+    
+    
+
+    function miniMapCreateToken(id, color) {
+        var mini_map_token = {
+            id: id,
+            color: color,
+            x: 0,
+            y: 0,
+            size: 0
+        };
+        return mini_map_token;
+    }
+
+    function miniMapRegisterToken(id, token) {
+        if (window.mini_map_tokens[id] === undefined) {
+            window.mini_map_tokens[id] = token;
+        }
+    }
+
+    function miniMapUnregisterToken(id) {
+        if (window.mini_map_tokens[id] !== undefined) {
+            delete window.mini_map_tokens[id];
+        }
+    }
+
+    function miniMapIsRegisteredToken(id) {
+        return window.mini_map_tokens[id] !== undefined;
+
+    }
+
+    function miniMapUpdateToken(id, x, y, size) {
+        if (window.mini_map_tokens[id] !== undefined) {
+
+            window.mini_map_tokens[id].x = x;
+            window.mini_map_tokens[id].y = y;
+            window.mini_map_tokens[id].size = size;
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function miniMapUpdatePos(x, y) {
+        window.mini_map_pos.text('x: ' + x.toFixed(0) + ', y: ' + y.toFixed(0));
+    }
+
+    function miniMapReset() {
+        cells = [];
+        window.mini_map_tokens = [];
+    }
+
+    function miniMapInit() {
+        window.mini_map_tokens = [];
+
+        cells = [];
+        current_cell_ids = [];
+        start_x = -7000;
+        start_y = -7000;
+        end_x = 7000;
+        end_y = 7000;
+        length_x = 14000;
+        length_y = 14000;
+
+        //Дерево мини-карты
+        if ($('#mini-map-wrapper').length === 0){
+            var wrapper = $('<div>').attr('id', 'mini-map-wrapper').css({position: 'fixed',zIndex: '1000',bottom: 10,right: 10,width: 160,height: 160});
+            
+            //Скрываем недостатки
+            $(".tosBox").hide();
+            $(".agario-promo").hide();
+            $("#mainPanel").find("hr").hide();
+            $("#mainPanel").find("center").hide();
+            //jQuery("body").append("<div style='width:300px;height:100px;position:fixed;left:10px;bottom:10px;border:1px solid black;background:#fff;' id='qqk'></div>");
+            
+            var setka = $("<div id='setka' style='width:160px;height:160px;position:fixed;bottom:10px;right:10px;'><table width='100%' height='100%'><tr><td>A1</td><td>A2</td><td>A3</td><td>A4</td><td>A5</td><td>A6</td></tr><tr><td>B1</td><td>B2</td><td>B3</td><td>B4</td><td>B5</td><td>B6</td></tr><tr><td>C1</td><td>C2</td><td>C3</td><td>C4</td><td>C5</td><td>C6</td></tr><tr><td>D1</td><td>D2</td><td>D3</td><td>D4</td><td>D5</td><td>D6</td></tr><tr><td>E1</td><td>E2</td><td>E3</td><td>E4</td><td>E5</td><td>E6</td></tr><tr><td>F1</td><td>F2</td><td>F3</td><td>F4</td><td>F5</td><td>F6</td></tr></table></div>");
+            setka.appendTo(document.body);
+            $("#setka table").css({"borderSpacing":"0px","font":"normal 10px Arial","background": '#303030'});
+            $("#setka table tr>td").css({"textAlign":"center","border":"1px solid #505050","color":"#707070"});
+            
+            
+            var mini_map = $('<canvas>').attr({id: 'mini-map',width: 160,height: 160}).css({width: '100%',height: '100%',position: 'relative'});
+            wrapper.append(mini_map).appendTo(document.body);
+
+            window.mini_map = mini_map[0];
+        }
+
+        //Обработчик мини-карты
+        if (render_timer === null)
+            render_timer = setInterval(miniMapRender, 1000 / 10);
+
+        //Позиция мини-карты
+        if ($('#mini-map-pos').length === 0) {
+            window.mini_map_pos = $('<div>').attr('id', 'mini-map-pos').css({
+                bottom: 10,
+                right: 10,
+                color: 'white',
+                fontSize: 15,
+                fontWeight: 800,
+                position: 'fixed'
+            }).appendTo(document.body);
+        }
+    }
+
+    // cell constructor
+    function Cell(id, x, y, size, color, name) {
+        cells[id] = this;
+        this.id = id;
+        this.ox = this.x = x;
+        this.oy = this.y = y;
+        this.oSize = this.size = size;
+        this.color = color;
+        this.points = [];
+        this.pointsAcc = [];
+        this.setName(name);
+    }
+
+    Cell.prototype = {
+        id: 0,
+        points: null,
+        pointsAcc: null,
+        name: null,
+        nameCache: null,
+        sizeCache: null,
+        x: 0,
+        y: 0,
+        size: 0,
+        ox: 0,
+        oy: 0,
+        oSize: 0,
+        nx: 0,
+        ny: 0,
+        nSize: 0,
+        updateTime: 0,
+        updateCode: 0,
+        drawTime: 0,
+        destroyed: false,
+        isVirus: false,
+        isAgitated: false,
+        wasSimpleDrawing: true,
+
+        destroy: function() {
+            delete cells[this.id];
+            id = current_cell_ids.indexOf(this.id);
+            -1 != id && current_cell_ids.splice(id, 1);
+            this.destroyed = true;
+            if (map_server === null || map_server.readyState !== window.WebSocket.OPEN){
+                miniMapUnregisterToken(this.id);
+            }
+        },
+        setName: function(name) {
+            this.name = name;
+        },
+        updatePos: function() {
+            if (map_server === null || map_server.readyState !== window.WebSocket.OPEN) {
+                if (options.enableMultiCells || -1 != current_cell_ids.indexOf(this.id)) {
+                    if (!miniMapIsRegisteredToken(this.id))
+                    {
+                        miniMapRegisterToken(
+                            this.id,
+                            miniMapCreateToken(this.id, this.color)
+                        );
+                    }
+
+                    var size_n = this.nSize/length_x;
+                    miniMapUpdateToken(this.id, (this.nx - start_x)/length_x, (this.ny - start_y)/length_y, size_n);
+                }
+            }
+
+            if (options.enablePosition && -1 != current_cell_ids.indexOf(this.id)) {
+                window.mini_map_pos.show();
+                miniMapUpdatePos(this.nx, this.ny);
+            } else {
+                window.mini_map_pos.hide();
+            }
+
+        }
+    };
+
+    String.prototype.capitalize = function() {
+        return this.charAt(0).toUpperCase() + this.slice(1);
+    };
+
+    function camel2cap(str) {
+        return str.replace(/([A-Z])/g, function(s){return ' ' + s.toLowerCase();}).capitalize();
+    };
+
+    // create a linked property from slave object
+    // whenever master[prop] update, slave[prop] update
+    function refer(master, slave, prop) {
+        Object.defineProperty(master, prop, {
+            get: function(){
+                return slave[prop];
+            },
+            set: function(val) {
+                slave[prop] = val;
+            },
+            enumerable: true,
+            configurable: true
+        });
+    };
+
+    // extract a websocket packet which contains the information of cells
+    function extractCellPacket(data, offset) {
+        ////
+        var dataToSend = {
+            destroyQueue : [],
+            nodes : [],
+            nonVisibleNodes : []
+        };
+        ////
+
+        var I = +new Date;
+        var qa = false;
+        var b = Math.random(), c = offset;
+        var size = data.getUint16(c, true);
+        c = c + 2;
+
+        // Nodes to be destroyed (killed)
+        for (var e = 0; e < size; ++e) {
+            var p2 = cells[data.getUint32(c, true)],
+                f = cells[data.getUint32(c + 4, true)],
+                c2 = c + 8;
+            p && f && (
+                f.destroy(),
+                f.ox = f.x,
+                f.oy = f.y,
+                f.oSize = f.size,
+                f.nx = p.x,
+                f.ny = p.y,
+                f.nSize = f.size,
+                f.updateTime = I,
+                dataToSend.destroyQueue.push(f.id));
+
+        }
+
+        // Nodes to be updated
+        for (e = 0; ; ) {
+            var d = data.getUint32(c, true);
+            c += 4;
+            if (0 == d) {
+                break;
+            }
+            ++e;
+            var p = data.getInt32(c, true),
+                c = c + 4,
+                f = data.getInt32(c, true),
+                c = c + 4;
+                g = data.getInt16(c, true);
+                c = c + 2;
+            for (var h = data.getUint8(c++), m = data.getUint8(c++), q = data.getUint8(c++), h = (h << 16 | m << 8 | q).toString(16); 6 > h.length; )
+                h = "0" + h;
+
+            var h = "#" + h,
+                k = data.getUint8(c++),
+                m = !!(k & 1),
+                q = !!(k & 16);
+
+            k & 2 && (c += 4);
+            k & 4 && (c += 8);
+            k & 8 && (c += 16);
+
+            for (var n, k = ""; ; ) {
+                n = data.getUint16(c, true);
+                c += 2;
+                if (0 == n)
+                    break;
+                k += String.fromCharCode(n)
+            }
+
+            n = k;
+            k = null;
+
+            var updated = false;
+            // if d in cells then modify it, otherwise create a new cell
+            cells.hasOwnProperty(d)
+                ? (k = cells[d],
+                   k.updatePos(),
+                   k.ox = k.x,
+                   k.oy = k.y,
+                   k.oSize = k.size,
+                   k.color = h,
+                   updated = true)
+                : (k = new Cell(d, p, f, g, h, n),
+                   k.pX = p,
+                   k.pY = f);
+
+            k.isVirus = m;
+            k.isAgitated = q;
+            k.nx = p;
+            k.ny = f;
+            k.nSize = g;
+            k.updateCode = b;
+            k.updateTime = I;
+            n && k.setName(n);
+
+            // ignore food creation
+            if (updated) {
+                dataToSend.nodes.push({
+                    id: k.id,
+                    x: k.nx,
+                    y: k.ny,
+                    size: k.nSize,
+                    color: k.color
+                });
+            }
+        }
+
+        // Destroy queue + nonvisible nodes
+        b = data.getUint32(c, true);
+        c += 4;
+        for (e = 0; e < b; e++) {
+            d = data.getUint32(c, true);
+            c += 4, k = cells[d];
+            null != k && k.destroy();
+            dataToSend.nonVisibleNodes.push(d);
+        }
+
+        var packet = {
+            type: 16,
+            data: dataToSend
+        }
+
+        miniMapSendRawData(msgpack.pack(packet));
+    }
+
+    // extract the type of packet and dispatch it to a corresponding extractor
+    function extractPacket(event) {
+        var c = 0;
+        var data = new DataView(event.data);
+        240 == data.getUint8(c) && (c += 5);
+        var opcode = data.getUint8(c);
+        c++;
+        switch (opcode) {
+            case 16: // cells data
+                extractCellPacket(data, c);
+                break;
+            case 20: // cleanup ids
+                current_cell_ids = [];
+                break;
+            case 32: // cell id belongs me
+                var id = data.getUint32(c, true);
+
+                if (current_cell_ids.indexOf(id) === -1)
+                    current_cell_ids.push(id);
+
+                miniMapSendRawData(msgpack.pack({
+                    type: 32,
+                    data: id
+                }));
+                break;
+            case 64: // get borders
+                start_x = data.getFloat64(c, !0), c += 8,
+                start_y = data.getFloat64(c, !0), c += 8,
+                end_x = data.getFloat64(c, !0), c += 8,
+                end_y = data.getFloat64(c, !0), c += 8,
+                center_x = (start_x + end_x) / 2,
+                center_y = (start_y + end_y) / 2,
+                length_x = Math.abs(start_x - end_x),
+                length_y = Math.abs(start_y - end_y);
+        }
+    };
+
+    /*function extractSendPacket(data) {
+        var view = new DataView(new ArrayBuffer(data.data));
+        switch (view.getUint8(0, true)) {
+            case 0:
+                player_name = [];
+                for (var i=1; i < data.byteLength; i+=2) {
+                    player_name.push(view.getUint16(i, true));
+                }
+
+                miniMapSendRawData(msgpack.pack({
+                    type: 0,
+                    data: player_name
+                }));
+                break;
+        }
+    }*/
+
+    // the injected point, overwriting the WebSocket constructor
+    window.WebSocket = function(url, wsUrl) {
+        console.log('Listen');
+
+        if (wsUrl === undefined) {
+            wsUrl = [];
+        }
+
+        var ws = new WebSocket(url, wsUrl);
+
+        refer(this, ws, 'binaryType');
+        refer(this, ws, 'bufferedAmount');
+        refer(this, ws, 'extensions');
+        refer(this, ws, 'wsUrl');
+        refer(this, ws, 'readyState');
+        refer(this, ws, 'url');
+
+        this.send = function(data){
+            //extractSendPacket(data);
+            return ws.send.call(ws, data);
+        };
+
+        this.close = function(){
+            return ws.close.call(ws);
+        };
+
+        this.onopen = function(event){};
+        this.onclose = function(event){};
+        this.onerror = function(event){};
+        this.onmessage = function(event){};
+
+        ws.onopen = function(event) {
+            miniMapInit();
+            agar_server = url;
+            miniMapSendRawData(msgpack.pack({
+                type: 100,
+                data: {url: url, region: $('#region').val(), gamemode: $('#gamemode').val(), party: location.hash}
+            }));
+            if (this.onopen)
+                return this.onopen.call(ws, event);
+        }.bind(this);
+
+        ws.onmessage = function(event) {
+            extractPacket(event);
+            if (this.onmessage)
+                return this.onmessage.call(ws, event);
+        }.bind(this);
+
+        ws.onclose = function(event) {
+            if (this.onclose)
+                return this.onclose.call(ws, event);
+        }.bind(this);
+
+        ws.onerror = function(event) {
+            if (this.onerror)
+                return this.onerror.call(ws, event);
+        }.bind(this);
+    };
+
+    window.WebSocket.prototype = WebSocket;
+
+    $(window.document).ready(function() {
+        miniMapInit();
+    });
+    
+    $(window).load(function() {
+        var main_canvas = document.getElementById('canvas');
+        if (main_canvas && main_canvas.onmousemove) {
+            document.onmousemove = main_canvas.onmousemove;
+            main_canvas.onmousemove = null;
+        }
+    });
+})();
+ </script>
+</body>
+
+</html>
